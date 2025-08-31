@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id              String            @id @default(cuid())
+  name            String
+  email           String            @unique
+  phone           String            @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  Participation   Participation[]
+  PlayerPoint     PlayerPoint[]
+  Achievement     Achievement[]
+  TournamentAward TournamentAward[]
+  PlayerSport     PlayerSport[]
+
+  @@map("players")
+}
+
+model Sport {
+  id            String          @id @default(cuid())
+  name          String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Tournament    Tournament[]
+  Achievement   Achievement[]
+  PlayerSport   PlayerSport[]
+  Participation Participation[]
+
+  @@map("sports")
+}
+
+model PlayerSport {
+  id       String @id @default(cuid())
+  playerId String
+  sportId  String
+
+  player Player @relation(fields: [playerId], references: [id])
+  sport  Sport  @relation(fields: [sportId], references: [id])
+
+  @@map("player_sports")
+}
+
+model PlayerPoint {
+  id        String   @id @default(cuid())
+  playerId  String
+  sportId   String
+  points    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@map("player_points")
+}
+
+model Tournament {
+  id        String   @id @default(cuid())
+  name      String
+  sportId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sport           Sport             @relation(fields: [sportId], references: [id])
+  Participation   Participation[]
+  TournamentAward TournamentAward[]
+
+  @@map("tournaments")
+}
+
+model TournamentAward {
+  id           String   @id @default(cuid())
+  tournamentId String
+  playerId     String
+  awardName    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  player     Player     @relation(fields: [playerId], references: [id])
+
+  @@map("tournament_awards")
+}
+
+model Participation {
+  id           String   @id @default(cuid())
+  playerId     String
+  tournamentId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  player     Player     @relation(fields: [playerId], references: [id])
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  Sport      Sport?     @relation(fields: [sportId], references: [id])
+  sportId    String?
+
+  @@map("participations")
+}
+
+model Achievement {
+  id        String   @id @default(cuid())
+  name      String
+  playerId  String
+  sportId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  player Player @relation(fields: [playerId], references: [id])
+  sport  Sport  @relation(fields: [sportId], references: [id])
+
+  @@map("achievements")
+}

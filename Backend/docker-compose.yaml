@@ -1,0 +1,20 @@
+
+# Docker Compose file for setting up a PostgreSQL database and Adminer for database management.
+services:
+
+  db:
+    image: postgres:15-alpine3.18
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    volumes:
+      - backend-database:/var/lib/postgresql/data
+      - ./src/util/test/db-creation.sql:/docker-entrypoint-initdb.d/db-creation.sql
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+volumes:
+  backend-database:
