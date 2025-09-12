@@ -1,0 +1,194 @@
+<!-- Mobile-First Responsive Dashboard -->
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo-section">
+        <i class="pi pi-truck text-2xl text-primary"></i>
+        <h1 class="logo-text">Express Delivery</h1>
+      </div>
+      
+      <!-- Notification Icon -->
+      <div class="notification-section">
+        <p-badge 
+          [value]="3" 
+          severity="danger"
+          size="large"
+          class="notification-badge">
+          <p-button 
+            icon="pi pi-bell" 
+            [text]="true" 
+            [rounded]="true"
+            size="large"
+            (click)="notificationPanel.toggle($event)"
+            class="notification-button">
+          </p-button>
+        </p-badge>
+        
+        <!-- Notification Panel -->
+        <p-overlayPanel #notificationPanel>
+          <div class="notification-content">
+            <h4 class="notification-title">Notifications</h4>
+            <div class="notification-list">
+              <div 
+                *ngFor="let item of notificationItems" 
+                class="notification-item"
+                (click)="handleNotificationClick(item)">
+                <i [class]="item.icon" class="notification-icon"></i>
+                <span>{{ item.label }}</span>
+              </div>
+            </div>
+          </div>
+        </p-overlayPanel>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Summary Cards Section -->
+    <section class="summary-section">
+      <div class="summary-grid">
+        <p-card 
+          *ngFor="let card of summaryCards()" 
+          class="summary-card"
+          [style]="{ 'border-left': '4px solid var(--primary-color)' }">
+          <ng-template pTemplate="content">
+            <div class="card-content">
+              <div class="card-icon-section">
+                <i 
+                  [class]="card.icon" 
+                  [class]="card.color"
+                  class="card-icon">
+                </i>
+              </div>
+              <div class="card-info">
+                <h3 class="card-value">{{ card.value | number }}</h3>
+                <p class="card-title">{{ card.title }}</p>
+                <span class="card-change" [class]="card.change?.startsWith('+') ? 'positive' : 'negative'">
+                  {{ card.change }}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+        </p-card>
+      </div>
+    </section>
+
+    <!-- Quick Actions Section -->
+    <section class="quick-actions-section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <p-button 
+          label="New Order" 
+          icon="pi pi-plus" 
+          class="quick-action-btn primary-btn"
+          (click)="onNewOrder()">
+        </p-button>
+        <p-button 
+          label="Track Package" 
+          icon="pi pi-search" 
+          class="quick-action-btn secondary-btn"
+          [outlined]="true"
+          (click)="onTrackPackage()">
+        </p-button>
+      </div>
+    </section>
+
+    <!-- Recent Orders Section -->
+    <section class="recent-orders-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Orders</h2>
+        <p-button 
+          label="View All" 
+          icon="pi pi-arrow-right" 
+          [text]="true"
+          size="small"
+          class="view-all-btn">
+        </p-button>
+      </div>
+      
+      <div class="orders-table-container">
+        <p-table 
+          [value]="recentOrders()" 
+          [responsive]="true"
+          [scrollable]="true"
+          scrollHeight="400px"
+          class="orders-table">
+          
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Time</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-order>
+            <tr>
+              <td>
+                <span class="order-id">{{ order.id }}</span>
+              </td>
+              <td>
+                <div class="customer-info">
+                <p-avatar 
+                  [label]="order.customerName.charAt(0)" 
+                  styleClass="customer-avatar">
+                </p-avatar>
+                  <div class="customer-details">
+                    <span class="customer-name">{{ order.customerName }}</span>
+                    <small class="customer-address">{{ order.address }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <p-tag 
+                  [value]="getStatusLabel(order.status)" 
+                  [severity]="getStatusSeverity(order.status)"
+                  class="status-tag">
+                </p-tag>
+              </td>
+              <td>
+                <span class="order-amount">{{ formatCurrency(order.amount) }}</span>
+              </td>
+              <td>
+                <span class="order-time">{{ order.time }}</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <p-button 
+                    icon="pi pi-eye" 
+                    [text]="true" 
+                    size="small"
+                    [rounded]="true"
+                    pTooltip="View Details">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-pencil" 
+                    [text]="true" 
+                    size="small"
+                    [rounded]="true"
+                    pTooltip="Edit">
+                  </p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Navigation -->
+  <footer class="dashboard-footer">
+    <p-tabMenu 
+      [model]="tabMenuItems" 
+      class="footer-tabmenu"
+      [activeItem]="tabMenuItems[0]">
+    </p-tabMenu>
+  </footer>
+</div>
